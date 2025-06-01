@@ -40,61 +40,12 @@
             margin-bottom: 40px;
         }
 
-        .input-section {
+        .message-section {
             background: #f7fafc;
             padding: 30px;
             border-radius: 15px;
             margin-bottom: 30px;
-        }
-
-        .input-group {
-            margin-bottom: 20px;
-        }
-
-        label {
-            display: block;
-            font-weight: bold;
-            color: #4a5568;
-            margin-bottom: 8px;
-        }
-
-        input[type="email"] {
-            width: 100%;
-            padding: 12px 15px;
-            border: 2px solid #e2e8f0;
-            border-radius: 8px;
-            font-size: 16px;
-            transition: border-color 0.3s;
-        }
-
-        input[type="email"]:focus {
-            outline: none;
-            border-color: #667eea;
-        }
-
-        .check-btn {
-            width: 100%;
-            padding: 15px;
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            color: white;
-            border: none;
-            border-radius: 10px;
-            font-size: 18px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: all 0.3s;
-            margin-top: 20px;
-        }
-
-        .check-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
-        }
-
-        .check-btn:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-            transform: none;
+            text-align: center;
         }
 
         .result-section {
@@ -203,17 +154,7 @@
             text-align: center;
         }
 
-        .error-message {
-            background: #fed7d7;
-            color: #c53030;
-            padding: 15px;
-            border-radius: 8px;
-            margin-top: 20px;
-            display: none;
-        }
-
         .loading {
-            display: none;
             text-align: center;
             margin: 40px 0;
         }
@@ -249,18 +190,13 @@
         <h1>나의 성, 문제 없을까?</h1>
         <p class="subtitle">검사 결과 확인</p>
 
-     <!-- 안내 메시지 -->
-    <div id="messageSection" class="input-section">
-    <h3 style="margin-bottom: 20px; text-align: center;">결과를 불러오는 중...</h3>
-    <p style="color: #718096; text-align: center;">
-        잠시만 기다려주세요.
-    </p>
-     </div>
-
-        <!-- 로딩 화면 -->
-        <div id="loading" class="loading">
-            <div class="spinner"></div>
-            <p>결과를 불러오는 중입니다...</p>
+        <!-- 메시지 섹션 -->
+        <div id="messageSection" class="message-section">
+            <div class="loading">
+                <div class="spinner"></div>
+                <h3>결과를 불러오는 중...</h3>
+                <p style="color: #718096; margin-top: 10px;">잠시만 기다려주세요.</p>
+            </div>
         </div>
 
         <!-- 결과 표시 섹션 -->
@@ -299,59 +235,110 @@
         </div>
     </div>
 
- // 페이지 로드 시 자동 실행
-window.onload = function() {
-    const urlParams = new URLSearchParams(window.location.search);
-    const responseId = urlParams.get('id');
-    
-    if (responseId) {
-        // 2초 후 결과 표시 (로딩 효과)
-        setTimeout(() => {
-            showResultById(responseId);
-        }, 2000);
-    } else {
-        document.getElementById('messageSection').innerHTML = `
-            <h3 style="color: #e53e3e;">잘못된 접근입니다</h3>
-            <p>올바른 결과 링크를 통해 접속해주세요.</p>
-        `;
-    }
-};
+    <script>
+        // 페이지 로드 시 자동 실행
+        window.onload = function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const responseId = urlParams.get('id');
+            
+            if (responseId) {
+                // 2초 후 결과 표시 (로딩 효과)
+                setTimeout(() => {
+                    showResultById(responseId);
+                }, 2000);
+            } else {
+                document.getElementById('messageSection').innerHTML = `
+                    <h3 style="color: #e53e3e;">잘못된 접근입니다</h3>
+                    <p style="margin-top: 10px;">올바른 결과 링크를 통해 접속해주세요.</p>
+                `;
+            }
+        };
 
-function showResultById(id) {
-    // 여기에 응답 번호별 결과 데이터
-    // 실제로는 서버나 데이터베이스에서 가져와야 함
-    const results = {
-        '1': {
-            name: '응답자 1',
-            overall_status: '양호',
-            scores: {
-                '성인식 왜곡': 1.17,
-                '성적 상상의 몰입도': 1.0,
-                '성적 관심의 특이성': 1.0,
-                '성충동 조절 어려움': 1.17,
-                '환상-현실 경계 모호성': 1.17,
-                '성적 책임감 부족': 1.17
+        function showResultById(id) {
+            // 응답 번호별 결과 데이터
+            // 실제로는 서버나 데이터베이스에서 가져와야 함
+            const results = {
+                '1': {
+                    name: '응답자 1',
+                    overall_status: '양호',
+                    scores: {
+                        '성인식 왜곡': 1.17,
+                        '성적 상상의 몰입도': 1.0,
+                        '성적 관심의 특이성': 1.0,
+                        '성충동 조절 어려움': 1.17,
+                        '환상-현실 경계 모호성': 1.17,
+                        '성적 책임감 부족': 1.17
+                    }
+                }
+            };
+            
+            if (results[id]) {
+                displayResult(results[id]);
+            } else {
+                document.getElementById('messageSection').innerHTML = `
+                    <div style="text-align: center;">
+                        <h3 style="color: #e53e3e;">결과를 찾을 수 없습니다</h3>
+                        <p style="margin-top: 10px;">결과가 아직 처리 중이거나 잘못된 번호입니다.</p>
+                    </div>
+                `;
             }
         }
-    };
-    
-    if (results[id]) {
-        displayResult(results[id]);
-    } else {
-        document.getElementById('messageSection').innerHTML = `
-            <h3 style="color: #e53e3e;">결과를 찾을 수 없습니다</h3>
-            <p>결과가 아직 처리 중이거나 잘못된 번호입니다.</p>
-        `;
-    }
-}
 
-// 나머지 함수들은 그대로 유지
-function displayResult(result) {
-    document.getElementById('messageSection').style.display = 'none';
-    document.getElementById('loading').style.display = 'none';
-    document.getElementById('resultSection').style.display = 'block';
-    
-    // 기존 코드 그대로...
-}
+        function displayResult(result) {
+            document.getElementById('messageSection').style.display = 'none';
+            document.getElementById('resultSection').style.display = 'block';
+            
+            // 기본 정보
+            document.getElementById('userName').textContent = `${result.name}님의 결과`;
+            
+            const statusElement = document.getElementById('overallStatus');
+            statusElement.textContent = result.overall_status;
+            statusElement.className = `overall-status ${getStatusClass(result.overall_status)}`;
+            
+            // 점수 카드
+            const scoresGrid = document.getElementById('scoresGrid');
+            scoresGrid.innerHTML = '';
+            
+            Object.entries(result.scores).forEach(([domain, score]) => {
+                const scoreCard = document.createElement('div');
+                scoreCard.className = 'score-card';
+                
+                const level = getScoreLevel(score);
+                scoreCard.innerHTML = `
+                    <div class="score-title">${domain}</div>
+                    <div class="score-value">${score}</div>
+                    <div class="score-level">${level}</div>
+                `;
+                
+                scoresGrid.appendChild(scoreCard);
+            });
+        }
+
+        function getStatusClass(status) {
+            const classes = {
+                '양호': 'status-good',
+                '주의 필요': 'status-caution',
+                '상담 권장': 'status-concern',
+                '즉시 개입': 'status-immediate',
+                '재검사 필요': 'status-immediate'
+            };
+            return classes[status] || '';
+        }
+
+        function getScoreLevel(score) {
+            if (score <= 2.5) return '양호';
+            if (score <= 3.5) return '주의 필요';
+            if (score <= 4.4) return '집중 관리';
+            return '즉시 개입';
+        }
+
+        function requestDetailedResult() {
+            const emailStatus = document.getElementById('emailStatus');
+            emailStatus.style.display = 'block';
+            
+            // 실제로는 서버에 요청을 보내야 함
+            // 현재는 Python 프로그램에서 일괄 처리
+        }
+    </script>
 </body>
 </html>
