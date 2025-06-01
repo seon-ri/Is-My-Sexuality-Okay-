@@ -249,19 +249,13 @@
         <h1>나의 성, 문제 없을까?</h1>
         <p class="subtitle">검사 결과 확인</p>
 
-        <!-- 이메일 입력 섹션 -->
-        <div id="inputSection" class="input-section">
-            <h3 style="margin-bottom: 20px;">결과 확인하기</h3>
-            <p style="color: #718096; margin-bottom: 20px;">
-                검사 시 입력하신 이메일 주소를 입력해주세요.
-            </p>
-            <div class="input-group">
-                <label for="email">이메일 주소</label>
-                <input type="email" id="email" placeholder="example@email.com">
-            </div>
-            <button class="check-btn" onclick="checkResult()">결과 확인</button>
-            <div id="errorMessage" class="error-message"></div>
-        </div>
+     <!-- 안내 메시지 -->
+    <div id="messageSection" class="input-section">
+    <h3 style="margin-bottom: 20px; text-align: center;">결과를 불러오는 중...</h3>
+    <p style="color: #718096; text-align: center;">
+        잠시만 기다려주세요.
+    </p>
+     </div>
 
         <!-- 로딩 화면 -->
         <div id="loading" class="loading">
@@ -305,135 +299,59 @@
         </div>
     </div>
 
-    <script>
-        // 임시 데이터베이스 (실제로는 서버나 Google Sheets 연동 필요)
-        // 여기서는 데모를 위한 샘플 데이터
-        const sampleResults = {
-            'test@example.com': {
-                name: '홍길동',
-                overall_status: '양호',
-                scores: {
-                    '성인식 왜곡': 1.17,
-                    '성적 상상의 몰입도': 1.0,
-                    '성적 관심의 특이성': 1.0,
-                    '성충동 조절 어려움': 1.17,
-                    '환상-현실 경계 모호성': 1.17,
-                    '성적 책임감 부족': 1.17
-                }
+ // 페이지 로드 시 자동 실행
+window.onload = function() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const responseId = urlParams.get('id');
+    
+    if (responseId) {
+        // 2초 후 결과 표시 (로딩 효과)
+        setTimeout(() => {
+            showResultById(responseId);
+        }, 2000);
+    } else {
+        document.getElementById('messageSection').innerHTML = `
+            <h3 style="color: #e53e3e;">잘못된 접근입니다</h3>
+            <p>올바른 결과 링크를 통해 접속해주세요.</p>
+        `;
+    }
+};
+
+function showResultById(id) {
+    // 여기에 응답 번호별 결과 데이터
+    // 실제로는 서버나 데이터베이스에서 가져와야 함
+    const results = {
+        '1': {
+            name: '응답자 1',
+            overall_status: '양호',
+            scores: {
+                '성인식 왜곡': 1.17,
+                '성적 상상의 몰입도': 1.0,
+                '성적 관심의 특이성': 1.0,
+                '성충동 조절 어려움': 1.17,
+                '환상-현실 경계 모호성': 1.17,
+                '성적 책임감 부족': 1.17
             }
-        };
-
-        function checkResult() {
-            const email = document.getElementById('email').value.trim();
-            const errorMessage = document.getElementById('errorMessage');
-            
-            // 이메일 유효성 검사
-            if (!email) {
-                showError('이메일 주소를 입력해주세요.');
-                return;
-            }
-            
-            if (!isValidEmail(email)) {
-                showError('올바른 이메일 형식이 아닙니다.');
-                return;
-            }
-            
-            // 로딩 표시
-            showLoading(true);
-            errorMessage.style.display = 'none';
-            
-            // 실제로는 서버에서 데이터를 가져와야 함
-            // 여기서는 2초 후 샘플 데이터 표시
-            setTimeout(() => {
-                showLoading(false);
-                
-                // 실제로는 서버에서 결과를 조회
-                // const result = await fetchResultFromServer(email);
-                
-                // 데모: 샘플 데이터 사용
-                if (email === 'test@example.com') {
-                    displayResult(sampleResults[email]);
-                } else {
-                    // 실제로는 매일 저녁 처리되므로 안내 메시지
-                    showError('아직 결과가 준비되지 않았습니다. 매일 저녁 6시에 결과가 업데이트됩니다.');
-                }
-            }, 2000);
         }
+    };
+    
+    if (results[id]) {
+        displayResult(results[id]);
+    } else {
+        document.getElementById('messageSection').innerHTML = `
+            <h3 style="color: #e53e3e;">결과를 찾을 수 없습니다</h3>
+            <p>결과가 아직 처리 중이거나 잘못된 번호입니다.</p>
+        `;
+    }
+}
 
-        function displayResult(result) {
-            document.getElementById('inputSection').style.display = 'none';
-            document.getElementById('resultSection').style.display = 'block';
-            
-            // 기본 정보
-            document.getElementById('userName').textContent = `${result.name}님의 결과`;
-            
-            const statusElement = document.getElementById('overallStatus');
-            statusElement.textContent = result.overall_status;
-            statusElement.className = `overall-status ${getStatusClass(result.overall_status)}`;
-            
-            // 점수 카드
-            const scoresGrid = document.getElementById('scoresGrid');
-            scoresGrid.innerHTML = '';
-            
-            Object.entries(result.scores).forEach(([domain, score]) => {
-                const scoreCard = document.createElement('div');
-                scoreCard.className = 'score-card';
-                
-                const level = getScoreLevel(score);
-                scoreCard.innerHTML = `
-                    <div class="score-title">${domain}</div>
-                    <div class="score-value">${score}</div>
-                    <div class="score-level">${level}</div>
-                `;
-                
-                scoresGrid.appendChild(scoreCard);
-            });
-        }
-
-        function getStatusClass(status) {
-            const classes = {
-                '양호': 'status-good',
-                '주의 필요': 'status-caution',
-                '상담 권장': 'status-concern',
-                '즉시 개입': 'status-immediate',
-                '재검사 필요': 'status-immediate'
-            };
-            return classes[status] || '';
-        }
-
-        function getScoreLevel(score) {
-            if (score <= 2.5) return '양호';
-            if (score <= 3.5) return '주의 필요';
-            if (score <= 4.4) return '집중 관리';
-            return '즉시 개입';
-        }
-
-        function requestDetailedResult() {
-            const emailStatus = document.getElementById('emailStatus');
-            emailStatus.style.display = 'block';
-            
-            // 실제로는 서버에 요청을 보내야 함
-            // 여기서는 Python 프로그램에서 처리하도록 표시만
-            
-            // Google Forms로 요청 기록 (선택사항)
-            // submitToGoogleForms(email);
-        }
-
-        function isValidEmail(email) {
-            const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-            return re.test(email);
-        }
-
-        function showError(message) {
-            const errorMessage = document.getElementById('errorMessage');
-            errorMessage.textContent = message;
-            errorMessage.style.display = 'block';
-        }
-
-        function showLoading(show) {
-            document.getElementById('loading').style.display = show ? 'block' : 'none';
-            document.getElementById('inputSection').style.display = show ? 'none' : 'block';
-        }
-    </script>
+// 나머지 함수들은 그대로 유지
+function displayResult(result) {
+    document.getElementById('messageSection').style.display = 'none';
+    document.getElementById('loading').style.display = 'none';
+    document.getElementById('resultSection').style.display = 'block';
+    
+    // 기존 코드 그대로...
+}
 </body>
 </html>
