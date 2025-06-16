@@ -1022,7 +1022,6 @@
 
        // DOM이 로드되면 초기화
         document.addEventListener('DOMContentLoaded', function() {
-	console.log("컨테이너 실제 값:", container);
             // EmailJS 로드 확인 및 초기화
             if (typeof emailjs !== 'undefined') {
                 try {
@@ -1060,7 +1059,7 @@
                 'demo6-section',  // 직업
                 'demo7-section',  // 성적지향성
                 'demo8-section'   // 상담경험
-                // result-section은 별도 처리
+                'result-section' //결과
             );
             
             // localStorage 기능 비활성화 - 문제 해결을 위해 제거
@@ -1071,6 +1070,7 @@
         // 검사 문항 섹션 생성
         function createQuestionSections() {
             const container = document.getElementById('question-sections');
+	console.log("컨테이너 실제 값:", container);
             
             questions.forEach((q, index) => {
                 const section = document.createElement('div');
@@ -1115,16 +1115,21 @@
         }
 
         // 답변 선택
-        function selectAnswer(questionNum, value) {
-            answers[`q${questionNum}`] = value;
-            // localStorage 저장 기능 비활성화
-            // saveAnswers();
-            
-            // 자동으로 다음 문항으로
-            setTimeout(() => {
-                nextSection();
-            }, 300);
-        }
+	function selectAnswer(questionNum, value) {
+	    answers[`q${questionNum}`] = value;
+
+	    // 마지막 섹션이 아니라면 자동 이동
+	    if (currentSection < sectionOrder.length - 1) {
+	        setTimeout(() => {
+	            nextSection();
+	        }, 300);
+	    } else {
+	        // 마지막 문항일 경우: 검사 완료 버튼 기다림 or showResult()
+	        console.log("마지막 문항입니다. 다음 섹션으로 자동 이동하지 않음.");
+	        // 필요시 showResult() 호출 가능
+	        // showResult();
+	    }
+	}
 
         // 인구통계 답변 저장
         document.addEventListener('change', function(e) {
