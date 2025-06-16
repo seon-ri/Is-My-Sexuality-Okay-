@@ -1437,19 +1437,19 @@
         }
 
         // 결과 표시
-        function showResults(overall, scores, observations, risks) {
+        function showResults(overallResult, scaleScores, specialObservations, riskItems) {
             console.log('결과 표시 시작');
             
             // 종합 평가
             document.getElementById('overall-result').innerHTML = `
                 <h2>📋 종합 평가</h2>
                 <div class="result-header">
-                    <div class="result-icon">${overall.icon}</div>
+                    <div class="result-icon">${overallresult.icon}</div>
                     <div>
-                        <h3>${overall.title}</h3>
-                        <p>${overall.content}</p>
+                        <h3>${overallresult.title}</h3>
+                        <p>${overallresult.content}</p>
                         <p style="margin-top: 15px; padding: 15px; background: rgba(52,152,219,0.1); border-radius: 8px; font-weight: 500;">
-                            💡 <strong>권장사항:</strong> ${overall.recommendation}
+                            💡 <strong>권장사항:</strong> ${overallresult.recommendation}
                         </p>
                     </div>
                 </div>
@@ -1646,9 +1646,9 @@
             const observations = getSpecialObservations(scales);
             
             // 종합 평가
-            result.overall_level = overall.icon + ' ' + overall.title;
-            result.overall_content = overall.content;
-            result.overall_recommendation = overall.recommendation;
+            result.overall_level = overallresult.icon + ' ' + overallresult.title;
+            result.overall_content = overallresult.content;
+            result.overall_recommendation = overallresult.recommendation;
             
             // 척도별 결과 HTML
             let scaleHTML = '';
